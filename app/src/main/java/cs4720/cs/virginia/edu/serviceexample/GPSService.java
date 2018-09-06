@@ -1,23 +1,27 @@
 package cs4720.cs.virginia.edu.serviceexample;
 
+import android.Manifest;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.IBinder;
+import android.support.v4.app.ActivityCompat;
 import android.text.format.DateFormat;
 import android.util.Log;
 import android.widget.Toast;
+import android.support.v4.content.ContextCompat;
 
 import java.util.Date;
 
 public class GPSService extends Service {
     LocationManager locationManager;
     LocationListener locationListener;
+    int MY_PERMISSIONS_REQUEST_COARSE_LOCATION = -1;
 
     public GPSService() {
     }
@@ -50,20 +54,25 @@ public class GPSService extends Service {
         };
 
         // Register the listener with the Location Manager to receive location updates
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            // Permission is not granted
+            return Service.START_STICKY;
+        }
         locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
         return super.onStartCommand(intent,flags,startId);
     }
 
     @Override
     public void onCreate() {
-        Log.i("Intent Example", "Service onCreate");
+        Log.i("Service Example", "Service onCreate");
 
     }
 
     @Override
     public void onDestroy() {
         Toast.makeText(this, "Service Stopped", Toast.LENGTH_SHORT).show();
-        Log.i("Intent Example", "Service onDestroy");
+        Log.i("Service Example", "Service onDestroy");
         _shutdownService();
 
     }
@@ -78,7 +87,7 @@ public class GPSService extends Service {
 
         locationManager.removeUpdates(locationListener);
 
-        Log.i("Intent Example", "Timer stopped...");
+        Log.i("Service Example", "Timer stopped...");
     }
 
 
