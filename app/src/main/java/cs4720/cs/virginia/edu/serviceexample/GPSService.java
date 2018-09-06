@@ -10,18 +10,16 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.text.format.DateFormat;
 import android.util.Log;
 import android.widget.Toast;
-import android.support.v4.content.ContextCompat;
 
 import java.util.Date;
 
 public class GPSService extends Service {
     LocationManager locationManager;
     LocationListener locationListener;
-    int MY_PERMISSIONS_REQUEST_COARSE_LOCATION = -1;
 
     public GPSService() {
     }
@@ -43,6 +41,7 @@ public class GPSService extends Service {
         locationListener = new LocationListener() {
             public void onLocationChanged(Location location) {
                 // Called when a new location is found by the network location provider.
+                Log.d("Service Example", "Location change!");
                 doServiceWork(location);
             }
 
@@ -55,11 +54,10 @@ public class GPSService extends Service {
 
         // Register the listener with the Location Manager to receive location updates
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED) {
-            // Permission is not granted
-            return Service.START_STICKY;
+                == PackageManager.PERMISSION_GRANTED) {
+            Log.d("Service Example", "Starting location manager...");
+            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
         }
-        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
         return super.onStartCommand(intent,flags,startId);
     }
 
